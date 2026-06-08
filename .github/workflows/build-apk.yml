@@ -1,0 +1,60 @@
+name: Build DuoShield APK
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+      
+      - name: Generate project structure
+        run: |
+          chmod +x create_duoshield.sh
+          bash create_duoshield.sh
+      
+      - name: Create Firebase config
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            echo "$GOOGLE_SERVICES_JSON" | base64 -d > DuoShield/app/google-services.json
+          else
+            echo "Warning: GOOGLE_SERVICES_JSON secret not set. Using placeholder."
+            mkdir -p DuoShield/app
+            echo '{"projects":[]}' > DuoShield/app/google-services.json
+          fi
+      
+      - name: Build APK with Gradle
+        run: |
+          cd DuoShield
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+      
+      - name: Upload APK artifact
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: duoshield-debug-apk
+          path: DuoShield/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+      
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs
+          path: DuoShield/app/build/outputs/logs/
