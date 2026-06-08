@@ -1,0 +1,46 @@
+name: DuoShield Android CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build Debug APK
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Run project generation script
+        run: bash create_duoshield.sh
+
+      - name: Write google-services.json
+        run: |
+          mkdir -p DuoShield/app
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > DuoShield/app/google-services.json
+
+      - name: Make gradlew executable
+        run: chmod +x DuoShield/gradlew
+
+      - name: Build Debug APK
+        working-directory: DuoShield
+        run: ./gradlew assembleDebug --stacktrace --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: DuoShield-debug
+          path: DuoShield/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
