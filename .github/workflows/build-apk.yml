@@ -30,11 +30,14 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          mkdir -p DuoShield/app
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then
-            echo "$GOOGLE_SERVICES_JSON" | base64 -d > DuoShield/app/google-services.json
+            # Try base64 decode first (if it's base64 encoded)
+            echo "$GOOGLE_SERVICES_JSON" | base64 -d > DuoShield/app/google-services.json 2>/dev/null || \
+            # If that fails, assume it's already JSON
+            echo "$GOOGLE_SERVICES_JSON" > DuoShield/app/google-services.json
           else
             echo "Warning: GOOGLE_SERVICES_JSON secret not set. Using placeholder."
-            mkdir -p DuoShield/app
             echo '{"projects":[]}' > DuoShield/app/google-services.json
           fi
       
