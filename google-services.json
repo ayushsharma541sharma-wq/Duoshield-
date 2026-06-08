@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "972440188834",
+    "project_id": "duoshield-cd896",
+    "storage_bucket": "duoshield-cd896.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:972440188834:android:005e46e0154f4eb8da64fb",
+        "android_client_info": {
+          "package_name": "com.example.duoshield"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDP3hnRrpnNbRPc3LDjGLYPIu11EwMzB-4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
