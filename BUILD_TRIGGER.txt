@@ -1,0 +1,4 @@
+Build triggered: APK generation started
+Timestamp: 2026-06-08
+Firebase secret configured: ✓
+Ready for production build
